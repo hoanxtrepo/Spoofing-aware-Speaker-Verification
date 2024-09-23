@@ -1,4 +1,4 @@
-# Speaker Verification - PyTorch Implementation
+# Spoofing-aware Speaker Verification 
 
 <h1> 1. Setup </h1>
 
@@ -16,25 +16,20 @@ pip install -r requirements.txt
 
 - [x] [Room Impulse Response and Noise Database](https://www.openslr.org/28/) (Brecht et al., 2020)
 
-NOTE: tải dữ liệu từ 2 link ở trên và thay thế vào argument tại `musan_path` and `rir_path`
+NOTE: Replace the relative data path 
 
 ```console
-## train asv hoặc cm model
-[**] python train.py \
-    --save_path ... \
-    --model {asv, cm} 
+## Train single subsystem: ASV or CM only
+[**] python train.py  --save_path ...  --model {asv, cm} 
 
-## train cho mô hình joint train
-[**] python finetune.py \
-    --save_path exps/joint_trained_exp/ \
-    --asv_checkpoint ...\
-    --cm_checkpoint ...
+## Jointly-optimised training 
+[**] python finetune.py --save_path exps/exp/ --asv_checkpoint ... --cm_checkpoint ...
 ```
 
-**2.3. Testing**
+**2.3. Inferring**
 
 ```console
 
-[**] python {train.py | finetune.py} --initial_model ... --eval_list ... --eval
+[**] python {train.py | finetune.py} --check_point ... --eval_path ... --eval
 ```
 
