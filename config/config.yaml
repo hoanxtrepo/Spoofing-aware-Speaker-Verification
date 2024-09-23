@@ -1,0 +1,73 @@
+### PRE-PROCESS CONFIGURATION ###
+preprocessing:
+  signal:
+    sampling_rate: 16000
+    max_wav_value: 32768.0
+    segment_length: 32768
+  stft:
+    filter_length: 512        # fft points
+    hop_length: 160           # hop size
+    win_length: 400           # window size
+    window: "hann"            # window type
+  mel:
+    channels: 80              # number of Mel basis
+    fmin: 20                  # minimum frequency for mel basis
+    fmax: 7600                # maximum frequency for Mel basis
+    log_base: null
+  num_frames: 200
+
+### FRONTEND MODEL CONFIGURATION ###
+sinc_net:
+  cnn_N_filt: [80, 60, 60]
+  cnn_len_filt: [251, 5, 5]
+  cnn_max_pool_len: [3, 3, 3]
+  cnn_use_laynorm_inp: true
+  cnn_use_batchnorm_inp: false
+  cnn_use_laynorm: [true, true, true]
+  cnn_use_batchnorm: [false, false, false]
+  cnn_act: [leaky_relu, leaky_relu, leaky_relu]
+  cnn_drop: [0.0, 0.0, 0.0]
+  is_flat: false # default: false (change depend on backend model)
+
+### BACKEND MODEL CONFIGURATION ###
+ecapa_tdnn:
+  C: 1024                   # Channel size for the speaker encoder
+  fixed_C: 1536             # fixed the shape of the output from MFA layer, that is close to the setting from ECAPA paper. NOTE: (C * 3) / 2
+  kernel_size: 5
+  bottle_neck:
+    kernel_size: 3
+    dilation: [2, 3, 4]
+    scale: 8
+  attn_dims: 256
+  embedding_size: 192
+ds_tdnn:
+  sparse: true
+  C: 1536
+  fixed_C: 1536
+  local_block:
+    kernel_size: [3, 3, 3]
+    scale: [4, 4, 8] # NOTE: [8, 8, 8] if C==1024 || [4, 6, 8] if C==960
+  global_block:
+    T: 200
+    drop_out: [0.3, 0.1, 0.1]
+    K: [4, 8, 8]
+  attn_dims: 256
+  embedding_size: 192
+  uniform_init: true
+
+assist:
+  first_conv: 128
+  filts: [70, [1, 32], [32, 32], [32, 64], [64, 64]]
+  gat_dims: [64, 32]
+  pool_ratios: [0.5, 0.7, 0.5, 0.5]
+  temperatures: [2.0, 2.0, 100.0, 100.0]
+
+### TRAIN CONFIGURATION ###
+loss_func: aam_softmax # only supported for `aam_softmax`, `softmax` & `nnnloss`
+loss:
+  margin: 0.2                    # Loss margin in AAM softmax
+  scale: 30                      # Loss scale in AAM softmax
+optim: 
+  lr: 0.01                  # Learning rate
+  wd: 2.0e-5                # Weight decay
+  lr_decay: 0.98            # Learning rate decay every [test_step] epoch(s)
